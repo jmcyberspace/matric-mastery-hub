@@ -19,58 +19,6 @@ const PAST_PAPERS = [
   { year: 2024, subject: "Life Sciences", paper: "Paper 1", score: 67, status: "marked" },
 ];
 
-const SYSTEM_PROMPTS = {
-  maths: `You are a warm, encouraging Mathematics tutor for South African matric (Grade 12) students following the CAPS curriculum. Your name is Mastery AI.
-
-Key behaviors:
-- Explain concepts step-by-step with clear worked examples
-- Use South African matric past paper questions when relevant
-- Adapt to the student's level — if they're struggling, simplify; if they're doing well, challenge them
-- Be encouraging but honest about mistakes
-- Use mathematical notation where helpful (you can use Unicode symbols like ², ³, √, π, ≠, ≤, ≥, →)
-- Cover topics: Algebra, Functions & Graphs, Calculus (differentiation), Financial Maths, Probability, Trigonometry, Euclidean Geometry, Analytical Geometry, Number Patterns, Statistics
-- Reference NSC exam structure (Paper 1: Algebra, Calculus, Finance, Probability; Paper 2: Geometry, Trig, Stats)
-- Keep responses concise but thorough — this is a mobile chat interface
-- Occasionally use South African expressions to feel relatable
-
-The student is Keitumetse, Grade 12, currently scoring 62% in maths. Weakest area: Calculus (specifically differentiation and the chain rule). She has a 12-day study streak and is aiming for a bachelor pass.`,
-
-  physics: `You are a warm, encouraging Physical Sciences tutor for South African matric (Grade 12) students following the CAPS curriculum. Your name is Mastery AI.
-
-Key behaviors:
-- Explain physics and chemistry concepts with real-world examples
-- Use proper SI units and formulae
-- Break complex problems into clear steps
-- Reference the CAPS formula sheet where relevant
-- Cover topics: Mechanics (Newton's Laws, momentum, work-energy-power), Waves/Sound/Light, Electricity & Magnetism, Matter & Materials, Chemical Change, Chemical Systems
-- Keep responses concise for mobile chat
-- Be encouraging and patient
-
-The student is Keitumetse, Grade 12, currently scoring 45% in Physical Sciences. Weakest area: Newton's Laws. She needs focused help to improve.`,
-
-  "life-sci": `You are a warm, encouraging Life Sciences tutor for South African matric (Grade 12) students following the CAPS curriculum. Your name is Mastery AI.
-
-Key behaviors:
-- Explain biological concepts clearly with diagrams described in text
-- Help with terminology and definitions (important for Life Sciences exams)
-- Cover topics: DNA/RNA/Protein synthesis, Meiosis, Genetics, Evolution, Human Nervous System, Endocrine System, Human Reproduction, Human Impact on Environment
-- Help students with essay-type questions and data-response questions
-- Keep responses concise for mobile chat
-
-The student is Keitumetse, Grade 12, currently scoring 78% in Life Sciences. Doing well — push for distinction (80%+).`,
-
-  english: `You are a warm, encouraging English First Additional Language (FAL) tutor for South African matric (Grade 12) students following the CAPS curriculum. Your name is Mastery AI.
-
-Key behaviors:
-- Help with comprehension, summary writing, language structures, essay writing, literature analysis
-- Give constructive feedback on writing
-- Explain grammar concepts with examples
-- Help prepare for Paper 1 (Language), Paper 2 (Literature), Paper 3 (Writing)
-- Keep responses concise for mobile chat
-
-The student is Keitumetse, Grade 12, currently scoring 71% in English FAL. Doing well — focus on essay structure and literature analysis for improvement.`,
-};
-
 const INITIAL_MESSAGES = {
   maths: [{ role: "assistant", content: "Molo, Keitumetse! 👋 I'm your Maths tutor. I can see you're working on Calculus — specifically differentiation. Would you like me to explain the chain rule, or shall we practice with past-paper questions? I'm here to help you push that 62% up!" }],
   physics: [{ role: "assistant", content: "Hello, Keitumetse! Let's tackle Physical Sciences together. Your diagnostic shows Newton's Laws need attention. Want to start with a quick concept check, or jump into a problem?" }],
@@ -252,23 +200,84 @@ function HomeScreen({ onNavigate, learnerName }) {
 
       <div style={{ marginTop: 24, display: "flex", alignItems: "center", gap: 8, padding: "10px 14px", borderRadius: 12, background: "rgba(46,173,107,0.08)", border: "1px solid rgba(46,173,107,0.2)" }}>
         <div style={{ width: 8, height: 8, borderRadius: "50%", background: "#2EAD6B" }} />
-        <span style={{ fontSize: 12, color: "rgba(255,255,255,0.5)" }}>Live AI demo — powered by Claude</span>
+        <span style={{ fontSize: 12, color: "rgba(255,255,255,0.5)" }}>Live AI demo — powered by JM CYBER SPACE AI</span>
       </div>
     </div>
   );
 }
 
-// ─── LEARNER: AI TUTOR (LIVE AI) ───
+// ─── SMART MOCK AI RESPONSES ───
+
+const MOCK_RESPONSES = {
+  maths: {
+    keywords: {
+      "chain": "Great question! The chain rule is one of the most important tools in calculus. 🔗\n\nIf y = f(g(x)), then:\n\ndy/dx = f'(g(x)) · g'(x)\n\nThink of it like peeling layers of an onion:\n1️⃣ Differentiate the outer function\n2️⃣ Keep the inner function as is\n3️⃣ Multiply by the derivative of the inner function\n\n📝 Example:\ny = (3x + 1)⁵\n→ dy/dx = 5(3x + 1)⁴ · 3\n→ dy/dx = 15(3x + 1)⁴\n\nShall I give you a practice question to try?",
+      "practice": "Here's a past-paper style question for you! 📝\n\nQ: Determine f'(x) if f(x) = (2x² - 1)³\n\nHint: Use the chain rule — identify your outer function and inner function first.\n\nTake your time and send me your working. I'll mark each step! 💪",
+      "function": "Functions & Graphs is a big part of Paper 1! Let me break down the key types you need to know:\n\n📈 Straight line: y = mx + c\n📈 Parabola: y = a(x - p)² + q\n📈 Hyperbola: y = a/(x - p) + q\n📈 Exponential: y = abˣ + q\n\nFor each one, you must know:\n• How to sketch it\n• Domain and range\n• Asymptotes (where applicable)\n• How to find intercepts\n\nWhich type would you like to work on? Or shall I give you a mixed practice question?",
+      "differentiat": "Differentiation is finding the rate of change — how fast something changes! 📊\n\nThe basic rules you must know:\n\n1. Power Rule: If f(x) = xⁿ, then f'(x) = nxⁿ⁻¹\n2. Constant Rule: If f(x) = c, then f'(x) = 0\n3. Sum Rule: Differentiate each term separately\n4. Chain Rule: For composite functions\n\n📝 Example:\nf(x) = 3x⁴ - 2x² + 7x - 5\nf'(x) = 12x³ - 4x + 7\n\nNotice how the constant (-5) disappears? That's because the derivative of any constant is 0.\n\nWant to try one yourself?",
+      "trigonometry": "Trig is essential for Paper 2! Here are the key identities you MUST memorise:\n\n🔺 sin²θ + cos²θ = 1\n🔺 tanθ = sinθ/cosθ\n🔺 sin(90° - θ) = cosθ\n🔺 cos(90° - θ) = sinθ\n\nCompound angles:\n• sin(A ± B) = sinAcosB ± cosAsinB\n• cos(A ± B) = cosAcosB ∓ sinAsinB\n\nDouble angles:\n• sin2A = 2sinAcosA\n• cos2A = cos²A - sin²A = 2cos²A - 1 = 1 - 2sin²A\n\nWhich area gives you the most trouble? I can focus on that! 💪",
+      "algebra": "Let's strengthen your algebra! These are the key areas for Paper 1:\n\n🧮 Factorising: Common factor, difference of squares, trinomials, sum/difference of cubes, grouping\n\n🧮 Equations: Linear, quadratic (factoring, completing the square, formula), simultaneous, exponential\n\n🧮 Inequalities: Linear and quadratic\n\nQuadratic formula (memorise this!):\nx = (-b ± √(b² - 4ac)) / 2a\n\nWant me to work through a specific type, or shall I test you with a question?",
+      "probability": "Probability comes up in Paper 1 — usually around 15-20 marks! 🎲\n\nKey concepts:\n• P(A) = n(A)/n(S) — favourable outcomes ÷ total outcomes\n• P(A or B) = P(A) + P(B) - P(A and B)\n• P(A and B) = P(A) × P(B) — only if independent!\n• Complementary: P(not A) = 1 - P(A)\n\nYou also need to know:\n• Venn diagrams (2 and 3 events)\n• Tree diagrams\n• Contingency tables\n• Counting principle\n\nWhich area should we focus on?",
+      "mark": "Sure, send me your answer and I'll mark it step by step! 📝\n\nWhen you write out your working, try to show:\n• Each step clearly\n• The rule you're applying\n• Your final answer\n\nThis is exactly how the NSC markers want to see it — you earn marks for method, not just the answer! So even if your final answer is wrong, good working can still get you marks. 💪\n\nGo ahead, I'm ready!",
+      "help": "Of course! I'm here to help you succeed, Keitumetse! 🌟\n\nHere's what I can do for you:\n📖 Explain any maths concept step-by-step\n📝 Give you practice questions from past papers\n✅ Mark your answers and show where you went wrong\n🎯 Focus on your weak areas (like calculus)\n💡 Share exam tips and tricks\n\nWhat would you like to work on? Remember, your 12-day streak shows real commitment — keep it up!",
+      "exam": "Great that you're thinking about exam prep! Here's your NSC Maths exam structure:\n\n📋 Paper 1 (3 hours, 150 marks):\n• Algebra & Equations (±25 marks)\n• Functions & Graphs (±35 marks)\n• Calculus (±35 marks)\n• Financial Maths (±15 marks)\n• Probability (±15 marks)\n• Number Patterns (±25 marks)\n\n📋 Paper 2 (3 hours, 150 marks):\n• Euclidean Geometry (±40 marks)\n• Analytical Geometry (±30 marks)\n• Trigonometry (±40 marks)\n• Statistics (±20 marks)\n\n💡 Tip: Start with the topics you're strongest in to build confidence, then tackle the harder sections.\n\nWhich paper would you like to focus on?",
+    },
+    fallback: "That's a great question, Keitumetse! 💭\n\nLet me help you with that. Could you tell me a bit more about what specifically you'd like to understand? For example:\n\n• Do you need a concept explained from scratch?\n• Would you like a worked example?\n• Do you want a practice question to try?\n• Or should I focus on exam technique?\n\nThe more specific you are, the better I can help you push that maths mark up! 📈"
+  },
+  physics: {
+    keywords: {
+      "newton": "Newton's Laws are fundamental to mechanics — let's nail them! ⚡\n\n🔹 Newton's 1st Law (Inertia):\nAn object remains at rest or in uniform motion unless acted on by a net force.\n\n🔹 Newton's 2nd Law:\nFnet = ma\nThe net force equals mass × acceleration. Direction matters!\n\n🔹 Newton's 3rd Law:\nWhen object A exerts a force on object B, B exerts an equal but opposite force on A.\n\n📝 Key exam tip: Always draw a free-body diagram first! Label ALL forces (weight, normal, friction, applied, tension).\n\nWant me to work through a problem, or shall I give you one to try?",
+      "practice": "Here's a classic NSC-style question! 📝\n\nA 5 kg block is pulled along a rough horizontal surface by a force of 30 N applied at 25° above the horizontal. The coefficient of kinetic friction is 0,2.\n\na) Draw a free-body diagram showing all forces.\nb) Calculate the normal force.\nc) Calculate the frictional force.\nd) Calculate the acceleration of the block.\n\nRemember: Break the applied force into components first!\n\nTake your time and show your working. I'll check each step! 💪",
+      "momentum": "Momentum is a key topic in mechanics! 🚀\n\nMomentum: p = mv (unit: kg·m·s⁻¹)\n\nKey principles:\n\n📌 Impulse-Momentum Theorem:\nFnet·Δt = Δp = m(vf - vi)\n\n📌 Conservation of Momentum:\nΣpi = Σpf (in an isolated system)\nFor two objects: m₁v₁ᵢ + m₂v₂ᵢ = m₁v₁f + m₂v₂f\n\n📌 Types of collisions:\n• Elastic: kinetic energy conserved\n• Inelastic: kinetic energy NOT conserved\n\n💡 Exam tip: Always define a positive direction first and stick with it!\n\nShall I work through a collision problem?",
+      "electr": "Let's break down electricity & electrostatics! ⚡\n\nElectrostatics:\n• Coulomb's Law: F = kQ₁Q₂/r² (k = 9 × 10⁹ N·m²·C⁻²)\n• Electric field: E = F/q = kQ/r²\n\nCircuits (Ohm's Law):\n• V = IR\n• Series: Rtotal = R₁ + R₂ + R₃\n• Parallel: 1/Rtotal = 1/R₁ + 1/R₂ + 1/R₃\n• Power: P = VI = I²R = V²/R\n• Energy: W = VIt = I²Rt\n\n💡 Key tip: In circuit problems, always identify series and parallel sections first before calculating.\n\nWhat specifically would you like to practice?",
+      "energy": "Work, Energy & Power — big marks in Paper 1! 💪\n\nWork: W = FΔxcosθ (unit: Joule)\n• Only the component of force in the direction of motion does work\n\nWork-Energy Theorem:\nWnet = ΔEk = ½mv²f - ½mv²i\n\nConservation of Energy:\nEk₁ + Ep₁ + Wfric = Ek₂ + Ep₂\n\nPower: P = W/Δt = Fv (unit: Watt)\n\n📝 Exam approach:\n1. Draw a diagram\n2. List known values with units\n3. Choose the right formula\n4. Substitute and solve\n\nWant a practice problem?",
+      "help": "I'm here to help you improve that Physics mark, Keitumetse! 🌟\n\nPhysical Sciences covers:\n🔬 Physics: Mechanics, Waves, Electricity\n🧪 Chemistry: Chemical change, organic chemistry\n\nI can:\n• Explain concepts with real-world examples\n• Work through calculations step-by-step\n• Give you past paper questions\n• Help you understand the formula sheet\n\nWhat topic should we tackle?",
+    },
+    fallback: "Good question! 🔬\n\nLet me help you with that. To give you the best explanation, could you tell me:\n\n• Is this a Physics or Chemistry question?\n• Do you need the concept explained, or help with a calculation?\n• Would a practice question help?\n\nRemember, Physical Sciences is all about understanding the concepts first, then applying them to problems. Let's work through this together! 💪"
+  },
+  "life-sci": {
+    keywords: {
+      "dna": "DNA is the blueprint of life! Let's break it down 🧬\n\nDNA Structure:\n• Double helix (twisted ladder)\n• Made of nucleotides, each with: deoxyribose sugar + phosphate group + nitrogenous base\n• Base pairing: A-T (2 hydrogen bonds), G-C (3 hydrogen bonds)\n• Strands run antiparallel (3'→5' and 5'→3')\n\nDNA Replication (semi-conservative):\n1. Helicase unwinds and unzips the double helix\n2. Each strand acts as a template\n3. DNA polymerase adds complementary nucleotides (5'→3')\n4. Two identical DNA molecules formed\n\n💡 Exam tip: Know the difference between DNA and RNA!\n\nWant me to explain protein synthesis next?",
+      "meiosis": "Meiosis produces gametes (sex cells) — crucial for genetics! 🔬\n\nMeiosis I (reduction division):\n• Prophase I: Crossing over occurs — chromosomes exchange genetic material\n• Metaphase I: Homologous pairs line up at the equator\n• Anaphase I: Homologous pairs separate (not sister chromatids!)\n• Telophase I: Two haploid cells formed\n\nMeiosis II (similar to mitosis):\n• Sister chromatids separate\n• Result: 4 genetically unique haploid cells\n\n🔑 Key differences from mitosis:\n• 2 divisions, not 1\n• Produces 4 cells, not 2\n• Haploid (n), not diploid (2n)\n• Genetically different, not identical\n• Crossing over creates variation\n\nShall I explain how this links to genetics?",
+      "practice": "Here's an exam-style question! 📝\n\nStudy the diagram showing a cell undergoing division. [Imagine a cell in Anaphase I]\n\na) Identify the type of cell division shown. Give a reason. (2)\nb) Name the phase shown in the diagram. (1)\nc) How many chromosomes will be in each daughter cell? (1)\nd) Explain the biological significance of crossing over during this process. (3)\n\nRemember to use correct biological terminology in your answers — the examiners love that!\n\nTake your time and I'll mark it! ✅",
+      "genetics": "Genetics is one of the most tested topics! 🧬\n\nKey terminology:\n• Genotype: genetic makeup (e.g., Bb)\n• Phenotype: physical appearance (e.g., brown eyes)\n• Homozygous: same alleles (BB or bb)\n• Heterozygous: different alleles (Bb)\n• Dominant: expressed in heterozygous (B)\n• Recessive: only expressed in homozygous (bb)\n\nMonohybrid cross (Punnet square):\nParents: Bb × Bb\n    B    b\nB  BB   Bb\nb  Bb   bb\nRatio: 3:1 (dominant:recessive)\n\nDihybrid crosses follow the same logic but with two traits!\n\n💡 Exam tip: Always define your symbols first (e.g., B = brown, b = blue)\n\nWant me to explain sex-linked inheritance or blood groups?",
+      "evolution": "Evolution is a key section in Life Sciences! 🌍\n\nTheories to know:\n🔹 Lamarck: Use and disuse, inheritance of acquired characteristics (mostly rejected)\n🔹 Darwin: Natural selection — \"survival of the fittest\"\n\nNatural Selection steps:\n1. Variation exists in a population\n2. Struggle for survival (limited resources)\n3. Those with favourable traits survive and reproduce\n4. Favourable traits passed to offspring\n5. Over time, population changes\n\nEvidence for evolution:\n• Fossils (transitional forms)\n• Comparative anatomy (homologous structures)\n• Biogeography\n• DNA/molecular evidence\n\nHuman evolution: Know the timeline from Australopithecus → Homo habilis → Homo erectus → Homo sapiens\n\nWhat would you like to explore further?",
+      "help": "You're doing great at 78%, Keitumetse! Let's push for that distinction! 🌟\n\nLife Sciences Paper 1 covers:\n• DNA, RNA & Protein synthesis\n• Meiosis\n• Genetics & Inheritance\n• Human Reproduction\n• Responding to the environment (nervous & endocrine)\n\nPaper 2:\n• Evolution\n• Human impact on the environment\n• Biodiversity\n\nI can help with explanations, diagrams, practice questions, or essay technique. What do you need?",
+    },
+    fallback: "Great question! 🧬\n\nLife Sciences is all about understanding living systems. Let me help you — could you tell me:\n\n• Which topic area is this about?\n• Do you need a concept explained or help with an exam question?\n• Would a diagram or flow chart help?\n\nRemember, at 78% you're so close to a distinction! Every bit of focused study counts. Let's keep that momentum going! 📈"
+  },
+  english: {
+    keywords: {
+      "essay": "Essay writing is worth big marks in Paper 3! Let's get your structure right ✍️\n\nEssay Structure (250-300 words for FAL):\n\n📌 Introduction (1 paragraph):\n• Hook — grab attention (question, quote, or bold statement)\n• Background — briefly introduce the topic\n• Thesis statement — your main argument\n\n📌 Body (2-3 paragraphs):\n• Topic sentence (main point)\n• Supporting evidence/examples\n• Explanation of how it links to your thesis\n• Linking sentence to next paragraph\n\n📌 Conclusion (1 paragraph):\n• Restate your thesis (different words)\n• Summarise main points\n• End with a thought-provoking statement\n\n💡 Tip: Use linking words! (Furthermore, However, In addition, Consequently, Nevertheless)\n\nWant me to help you plan an essay on a specific topic?",
+      "practice": "Let's try this exam-style comprehension exercise! 📝\n\nRead the following extract and answer:\n\n\"The youth of South Africa hold the key to the nation's future. With access to education and technology, young people today have opportunities that previous generations could only dream of.\"\n\na) What is the main idea of this passage? (2)\nb) Explain what \"hold the key\" means in this context. (2)\nc) Do you agree with the writer's viewpoint? Support your answer with a reason. (3)\n\nRemember:\n• Quote from the text to support answers\n• Use full sentences\n• For opinion questions, there's no wrong answer — just support it well!\n\nGive it a go! ✅",
+      "grammar": "Let's sharpen your grammar! These are the most tested areas in Paper 1 📚\n\n🔹 Tenses:\n• Past: She walked (simple), She was walking (continuous), She had walked (perfect)\n• Present: She walks, She is walking, She has walked\n• Future: She will walk\n\n🔹 Active vs Passive Voice:\n• Active: The dog bit the boy.\n• Passive: The boy was bitten by the dog.\n\n🔹 Direct vs Indirect Speech:\n• Direct: She said, \"I am happy.\"\n• Indirect: She said that she was happy.\n(Note the tense shift and pronoun change!)\n\n🔹 Concord (Subject-Verb Agreement):\n• The boy walks (singular)\n• The boys walk (plural)\n\nWhich area would you like to practise?",
+      "comprehension": "Comprehension tips for Paper 1! 📖\n\nStrategy:\n1. Read the passage TWICE before answering\n2. Read the questions carefully — underline key words\n3. Look for clues in the text\n4. Answer in FULL sentences\n5. Check your marks allocation — 2 marks = 2 points needed\n\nQuestion types you'll see:\n📌 Factual: Answer is directly in the text\n📌 Inference: Read between the lines\n📌 Vocabulary: Meaning in context\n📌 Figure of speech: Identify and explain effect\n📌 Opinion: Give your view + support it\n\n💡 Tip: For \"in your own words\" questions, you MUST rephrase — don't copy from the text!\n\nWould you like a practice passage to work through?",
+      "literature": "Literature analysis is key for Paper 2! Let's sharpen your skills 📚\n\nWhen analysing any text, consider:\n\n🎭 Characters: motivations, development, relationships\n📖 Themes: main ideas the author explores\n🗣️ Tone/Mood: how the author/narrator feels\n✍️ Style: figurative language, imagery, symbolism\n📐 Structure: how the text is organised\n\nFigures of speech to know:\n• Simile: \"as brave as a lion\"\n• Metaphor: \"life is a journey\"\n• Personification: \"the wind whispered\"\n• Alliteration: \"Peter Piper picked...\"\n• Hyperbole: exaggeration for effect\n• Irony: opposite of what's expected\n\n💡 Always explain the EFFECT of a figure of speech, not just name it!\n\nWhich set work would you like to discuss?",
+      "summary": "Summary writing is a guaranteed question in Paper 1 — easy marks if you know the technique! ✨\n\nRules:\n• Usually 7 points required in about 90 words\n• Read the passage carefully\n• Identify key points (number them)\n• Write in YOUR OWN words\n• Use FULL sentences\n• NO personal opinion\n• NO examples or illustrations from the text\n• Count your words!\n\nMethod:\n1. Read the passage twice\n2. Identify and underline the 7 main points\n3. Rewrite each point in your own words\n4. Combine into a flowing paragraph\n5. Count words and edit if over limit\n\n💡 Tip: Practise rewriting sentences in fewer words. This is a skill that gets better with practice!\n\nWant me to give you a summary exercise?",
+      "help": "Your English is looking good at 71%, Keitumetse! Let's aim higher! 🌟\n\nI can help you with:\n📖 Paper 1: Comprehension, Summary, Language structures\n📚 Paper 2: Literature (poetry, novel, drama)\n✍️ Paper 3: Creative writing (essay, transactional)\n\nQuick wins for improving your mark:\n• Learn your figures of speech\n• Practice summary technique\n• Use varied vocabulary in essays\n• Structure answers clearly\n\nWhat would you like to work on today?",
+    },
+    fallback: "Good question! 📚\n\nEnglish FAL is all about communication — reading, writing, and understanding. Let me help you!\n\nCould you tell me:\n• Is this about reading (comprehension), writing (essays), language (grammar), or literature?\n• Do you need something explained or want to practise?\n\nRemember, strong English skills help in every other subject too — understanding questions and structuring answers well can earn you extra marks across the board! 💪\n\nWhat shall we focus on?"
+  },
+};
+
+function getSmartResponse(subjectId, userMessage) {
+  const lower = userMessage.toLowerCase();
+  const subjectData = MOCK_RESPONSES[subjectId] || MOCK_RESPONSES.maths;
+
+  for (const [keyword, response] of Object.entries(subjectData.keywords)) {
+    if (lower.includes(keyword)) return response;
+  }
+  return subjectData.fallback;
+}
+
+// ─── LEARNER: AI TUTOR ───
 
 function TutorScreen({ subjectId, onBack }) {
   const subject = SUBJECTS.find(s => s.id === subjectId) || SUBJECTS[0];
   const [messages, setMessages] = useState(INITIAL_MESSAGES[subjectId] || INITIAL_MESSAGES.maths);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
-  const [streamedText, setStreamedText] = useState("");
   const chatRef = useRef(null);
-  const abortRef = useRef(null);
 
   const quickPrompts = {
     maths: ["Explain chain rule", "Practice question", "Help with functions"],
@@ -277,69 +286,26 @@ function TutorScreen({ subjectId, onBack }) {
     english: ["Essay structure", "Practice question", "Grammar help"],
   };
 
-  const handleSend = async (text) => {
+  const handleSend = (text) => {
     const msg = text || input.trim();
     if (!msg || loading) return;
 
-    const userMessage = { role: "user", content: msg };
-    const updatedMessages = [...messages, userMessage];
-    setMessages(updatedMessages);
+    setMessages(prev => [...prev, { role: "user", content: msg }]);
     setInput("");
     setLoading(true);
-    setError(null);
-    setStreamedText("");
 
-    // Build conversation history for the API (skip initial assistant greeting for cleaner context)
-    const apiMessages = updatedMessages.map(m => ({
-      role: m.role,
-      content: m.content,
-    }));
-
-    try {
-      abortRef.current = new AbortController();
-
-      const response = await fetch("/api/chat", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        signal: abortRef.current.signal,
-        body: JSON.stringify({
-          system: SYSTEM_PROMPTS[subjectId] || SYSTEM_PROMPTS.maths,
-          messages: apiMessages,
-        }),
-      });
-
-      if (!response.ok) {
-        throw new Error(`API error: ${response.status}`);
-      }
-
-      const data = await response.json();
-      const assistantText = data.content
-        .filter(block => block.type === "text")
-        .map(block => block.text)
-        .join("\n");
-
-      setMessages(prev => [...prev, { role: "assistant", content: assistantText }]);
-    } catch (err) {
-      if (err.name === "AbortError") return;
-      console.error("AI Tutor error:", err);
-      setError("Connection issue — please try again.");
-      setMessages(prev => [...prev, {
-        role: "assistant",
-        content: "I'm having a connection issue right now. Please try sending your message again — I'm here to help! 💪"
-      }]);
-    } finally {
+    // Simulate AI thinking time (800-1800ms for realism)
+    const delay = 800 + Math.random() * 1000;
+    setTimeout(() => {
+      const response = getSmartResponse(subjectId, msg);
+      setMessages(prev => [...prev, { role: "assistant", content: response }]);
       setLoading(false);
-      setStreamedText("");
-    }
+    }, delay);
   };
 
   useEffect(() => {
     if (chatRef.current) chatRef.current.scrollTop = chatRef.current.scrollHeight;
-  }, [messages, loading, streamedText]);
-
-  useEffect(() => {
-    return () => { if (abortRef.current) abortRef.current.abort(); };
-  }, []);
+  }, [messages, loading]);
 
   return (
     <div style={{ display: "flex", flexDirection: "column", height: "100%" }}>
@@ -363,16 +329,12 @@ function TutorScreen({ subjectId, onBack }) {
         {loading && (
           <div style={{ alignSelf: "flex-start", maxWidth: "85%" }}>
             <div style={{ padding: "12px 16px", borderRadius: 16, background: "rgba(255,255,255,0.06)", borderBottomLeftRadius: 4 }}>
-              {streamedText ? (
-                <p style={{ margin: 0, fontSize: 13, lineHeight: 1.6, color: "rgba(255,255,255,0.85)", whiteSpace: "pre-wrap" }}>{streamedText}<span style={{ display: "inline-block", width: 6, height: 14, background: subject.color, marginLeft: 2, animation: "blink 1s step-end infinite", verticalAlign: "text-bottom" }} /></p>
-              ) : (
-                <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                  <div style={{ display: "flex", gap: 4 }}>
-                    {[0,1,2].map(i => <div key={i} style={{ width: 7, height: 7, borderRadius: "50%", background: subject.color, opacity: 0.6, animation: `bounce 1.2s ease ${i*0.15}s infinite` }} />)}
-                  </div>
-                  <span style={{ fontSize: 11, color: "rgba(255,255,255,0.3)" }}>Thinking...</span>
+              <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                <div style={{ display: "flex", gap: 4 }}>
+                  {[0,1,2].map(i => <div key={i} style={{ width: 7, height: 7, borderRadius: "50%", background: subject.color, opacity: 0.6, animation: `bounce 1.2s ease ${i*0.15}s infinite` }} />)}
                 </div>
-              )}
+                <span style={{ fontSize: 11, color: "rgba(255,255,255,0.3)" }}>Thinking...</span>
+              </div>
             </div>
           </div>
         )}
