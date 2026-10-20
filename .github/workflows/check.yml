@@ -40,7 +40,7 @@ jobs:
           docker compose -f compose.yaml -f compose.ci.yaml run --rm manage
           docker compose -f compose.yaml -f compose.ci.yaml run --rm manage
       - name: Run security and workflow tests as the restricted database role
-        run: node --env-file=.env scripts/test-postgres.js
+        run: docker compose -f compose.yaml -f compose.ci.yaml run --rm --no-deps test
       - name: Start the production app and check served assets
         run: |
           docker compose -f compose.yaml -f compose.ci.yaml up -d --wait app
