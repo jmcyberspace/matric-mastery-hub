@@ -1,0 +1,10 @@
+[Unit]
+Description=Daily Matric Mastery backup at 02:15 South African time
+
+[Timer]
+OnCalendar=*-*-* 00:15:00 UTC
+Persistent=true
+RandomizedDelaySec=5min
+
+[Install]
+WantedBy=timers.target

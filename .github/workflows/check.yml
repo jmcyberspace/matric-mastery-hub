@@ -1,0 +1,60 @@
+name: Build and security checks
+on:
+  push:
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: npm
+      - run: npm ci --ignore-scripts --no-fund
+      - run: npm test
+      - run: npm run build
+      - run: npm audit --audit-level=high
+  postgres-and-container:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      DATABASE_NAME: matric_test
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+          cache: npm
+      - run: npm ci --ignore-scripts --no-fund
+      - name: Generate disposable credentials
+        run: node scripts/setup-env.js --origin https://matric.example.test --privacy-contact privacy@example.test
+      - name: Build the runtime image
+        run: docker compose -f compose.yaml -f compose.ci.yaml build app
+      - name: Start isolated PostgreSQL and apply migrations twice
+        run: |
+          docker compose -f compose.yaml -f compose.ci.yaml up -d --wait db
+          docker compose -f compose.yaml -f compose.ci.yaml run --rm manage
+          docker compose -f compose.yaml -f compose.ci.yaml run --rm manage
+      - name: Run security and workflow tests as the restricted database role
+        run: node --env-file=.env scripts/test-postgres.js
+      - name: Start the production app and check served assets
+        run: |
+          docker compose -f compose.yaml -f compose.ci.yaml up -d --wait app
+          node scripts/smoke.js
+      - name: Exercise an encrypted backup and isolated restore
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y age
+          age-keygen -o "$RUNNER_TEMP/matric-backup-key.txt"
+          export BACKUP_AGE_RECIPIENT="$(age-keygen -y "$RUNNER_TEMP/matric-backup-key.txt")"
+          bash scripts/backup.sh
+          export BACKUP_AGE_IDENTITY="$RUNNER_TEMP/matric-backup-key.txt"
+          backups=(backups/*.dump.age)
+          bash scripts/restore-drill.sh "${backups[0]}" matric_restore_ci
+      - name: Stop disposable services
+        if: always()
+        run: docker compose -f compose.yaml -f compose.ci.yaml down --volumes
