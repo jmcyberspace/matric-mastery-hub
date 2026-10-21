@@ -27,9 +27,23 @@ Teacher reports cover assessments assigned to the selected class. A low average 
 
 ## Start here
 
+- [Test on your Windows PC with Docker Desktop](docs/LOCAL_TESTING.md)
 - [Deploy on the VPS, configure HTTPS and create the administrator](docs/DEPLOYMENT.md)
 - [Back up, restore, upgrade and recover accounts](docs/OPERATIONS.md)
 - [Security design and verification limits](SECURITY.md)
+
+## Run locally
+
+With Node.js 24 installed and Docker Desktop running Linux containers, open a terminal in this project folder:
+
+```sh
+npm run local
+npm run local:admin -- --email admin@example.test --name "Local Administrator"
+```
+
+Choose your administrator password when prompted, then open **http://localhost:3010** and complete authenticator setup. The launcher builds the app, generates local credentials, prepares PostgreSQL and loads the foundation practice questions. It needs no host `npm install`, separate PostgreSQL installation, domain or VPS. The first build needs internet access.
+
+Run `npm run local:check` to check the running app and `npm run local:stop` to stop it while preserving your records. Start again with `npm run local`. See [Local testing](docs/LOCAL_TESTING.md) for Windows instructions, a walkthrough and troubleshooting.
 
 ## Development and checks
 

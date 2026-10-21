@@ -4,6 +4,11 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "local": "node scripts/local.js",
+    "local:admin": "node scripts/local.js admin",
+    "local:stop": "node scripts/local.js stop",
+    "local:logs": "node scripts/local.js logs",
+    "local:check": "node scripts/local.js check",
     "dev": "vite --host 127.0.0.1",
     "dev:server": "node --env-file-if-exists=.env --watch server/index.js",
     "start": "node --env-file-if-exists=.env server/index.js",
