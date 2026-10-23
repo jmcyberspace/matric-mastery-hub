@@ -4,7 +4,7 @@
   body{font-size:15px;background:#f5f7f3}
   h1{font-size:clamp(27px,2.7vw,38px);letter-spacing:-1.1px;font-weight:650}
   h2{font-size:21px}h3{font-size:17px}small,.small{font-size:13px}
-  input,select,textarea{font-size:16px;min-height:46px}
+  input:not([type=radio]):not([type=checkbox]),select,textarea{font-size:16px;min-height:46px}
   .button{font-size:14px;min-height:46px;padding:12px 17px}
   .icon-button{min-width:44px;min-height:44px}.text-link,.inline-link{font-size:14px;min-height:32px}
   .eyebrow{font-size:11px;letter-spacing:1.5px;color:#55695c}
