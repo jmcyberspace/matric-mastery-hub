@@ -1,0 +1,16 @@
+[Unit]
+Description=Encrypted Matric Mastery database backup
+Requires=docker.service
+After=docker.service
+
+[Service]
+Type=oneshot
+User=root
+WorkingDirectory=/opt/matric-mastery
+EnvironmentFile=/etc/matric-mastery-backup.env
+ExecStart=/usr/bin/bash /opt/matric-mastery/scripts/backup.sh
+UMask=0077
+TimeoutStartSec=30min
+
+# Add an operator-owned offsite transfer after a successful backup.
+# This service does not delete old backups or choose a retention policy.

@@ -1,0 +1,15 @@
+# CI ONLY. Run the test process beside PostgreSQL on its private network.
+services:
+  test:
+    image: node:24-bookworm-slim
+    profiles: [test]
+    working_dir: /work
+    volumes: [".:/work:ro"]
+    networks: [database]
+    environment:
+      TEST_DATABASE_URL: postgresql://matric_app:${APP_DB_PASSWORD}@db:5432/${DATABASE_NAME:-matric_test}
+    command: ["node", "--test", "--test-concurrency=1", "tests/platform.test.js"]
+    read_only: true
+    tmpfs: ["/tmp:rw,noexec,nosuid,size=64m"]
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]

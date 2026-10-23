@@ -1,0 +1,78 @@
+name: matric-mastery
+services:
+  db:
+    image: postgres:17-bookworm
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${DATABASE_NAME:-matric_mastery}
+      POSTGRES_USER: matric_owner
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Generate .env first}
+      APP_DB_PASSWORD: ${APP_DB_PASSWORD:?Generate .env first}
+      POSTGRES_INITDB_ARGS: --auth-host=scram-sha-256
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./deploy/postgres-init.sh:/docker-entrypoint-initdb.d/10-app-role.sh:ro
+    networks: [database]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -h 127.0.0.1 -U matric_owner -d $$POSTGRES_DB"]
+      interval: 5s
+      timeout: 3s
+      retries: 12
+    shm_size: 128mb
+    mem_limit: 1g
+    logging:
+      driver: json-file
+      options: { max-size: "10m", max-file: "3" }
+  app:
+    build: .
+    image: matric-mastery:local
+    restart: unless-stopped
+    init: true
+    depends_on:
+      db: { condition: service_healthy }
+    ports: ["127.0.0.1:${PORT:-3010}:3010"]
+    networks: [database, outbound]
+    environment:
+      NODE_ENV: production
+      HOST: 0.0.0.0
+      PORT: 3010
+      APP_ORIGIN: ${APP_ORIGIN:?Set APP_ORIGIN}
+      PRIVACY_CONTACT: ${PRIVACY_CONTACT:?Set PRIVACY_CONTACT}
+      DATABASE_URL: postgresql://matric_app:${APP_DB_PASSWORD}@db:5432/${DATABASE_NAME:-matric_mastery}
+      APP_ENCRYPTION_KEY: ${APP_ENCRYPTION_KEY:?Set encryption key}
+      TRUST_PROXY: loopback,uniquelocal
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+      ANTHROPIC_MODEL: ${ANTHROPIC_MODEL:-}
+      AI_DAILY_LIMIT: ${AI_DAILY_LIMIT:-30}
+      AI_GLOBAL_DAILY_LIMIT: ${AI_GLOBAL_DAILY_LIMIT:-1000}
+      SMTP_HOST: ${SMTP_HOST:-}
+      SMTP_PORT: ${SMTP_PORT:-587}
+      SMTP_USER: ${SMTP_USER:-}
+      SMTP_PASSWORD: ${SMTP_PASSWORD:-}
+      MAIL_FROM: ${MAIL_FROM:-}
+    read_only: true
+    tmpfs: ["/tmp:rw,noexec,nosuid,size=64m"]
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    mem_limit: 1g
+    pids_limit: 150
+    logging:
+      driver: json-file
+      options: { max-size: "10m", max-file: "3" }
+  manage:
+    image: matric-mastery:local
+    profiles: [ops]
+    depends_on:
+      db: { condition: service_healthy }
+    networks: [database]
+    environment:
+      DATABASE_URL: postgresql://matric_owner:${POSTGRES_PASSWORD}@db:5432/${DATABASE_NAME:-matric_mastery}
+    command: ["node","scripts/migrate.js"]
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+networks:
+  database: { internal: true }
+  outbound: {}
+volumes:
+  postgres_data: {}
