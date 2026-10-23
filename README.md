@@ -11,13 +11,17 @@ This branch replaces the original interactive demonstration. It contains working
 - Classes, private invitations, rotating class codes, teacher-owned reports, membership removal and account disabling.
 - Teacher-authored multiple-choice assessments, autosaved answers, server deadlines and marking, answer explanations after submission, printable worksheets and memoranda.
 - Saved study sessions, actual assessment averages, teacher study plans and learner completion.
-- An Anthropic-backed tutor with stored conversations, per-user and platform quotas, request deduplication and selectable English, Afrikaans or Setswana replies.
+- A topic-led learner home and an Anthropic-backed tutor with **Explain simply**, **Show an example**, **Give me a hint** and **Quiz me** modes, saved topic conversations, quotas, request deduplication and selectable English, Afrikaans or Setswana replies.
+- Eight original topic guides with worked examples and repeatable two-question checks. Checks are marked on the server, saved privately and can be shared with the tutor by the learner for a reasoning review.
+- Separate teacher and administrator homes with real class totals and service status, plus readable phone navigation and responsive learning screens.
 - CSV class reports, browser Print / Save as PDF, progress messages that teachers can copy, personal data export and learner account deletion.
 - Database migrations, encrypted backup tooling, isolated restore drills, health checks and CI.
 
 There is no Vercel or Supabase dependency. AI and email are external services only when configured; learning records and authentication live in PostgreSQL on your VPS.
 
 ## Content and boundaries
+
+The guided-learning catalog contains eight foundation topics across Mathematics, Physical Sciences, Life Sciences and English FAL. Each has a guide, a worked example and four original questions, presented as two alternating checks. These shared Grade 11–12 foundations require subject-teacher review before school use. A saved check score describes that question set; it is not a mastery rating or an exam mark. Guides and checks work without an AI connection. Live AI adds explanations and conversational feedback only when the provider key and model are configured.
 
 The optional seed creates eight short foundation assessments: six questions per subject for each grade, using a shared foundation question set. It does **not** create demonstration accounts, marks or progress. This is a starter content library, not a complete CAPS course or a collection of official NSC examinations. Teachers must review suitability and add their own content. Official past papers are linked to the DBE library.
 
@@ -31,6 +35,7 @@ Teacher reports cover assessments assigned to the selected class. A low average 
 - [Deploy on the VPS, configure HTTPS and create the administrator](docs/DEPLOYMENT.md)
 - [Back up, restore, upgrade and recover accounts](docs/OPERATIONS.md)
 - [Security design and verification limits](SECURITY.md)
+- [Review topic content and evaluate the AI learning flow](docs/AI_LEARNING.md)
 
 ## Run locally
 
@@ -76,6 +81,7 @@ Generate the encryption key with `node -e "console.log(require('crypto').randomB
 | `server/` | Authentication, authorization, learning, teaching and tutor APIs |
 | `db/migrations/` | Versioned PostgreSQL schema migrations with checksum checks |
 | `db/practice-content.js` | Original foundation practice questions |
+| `db/topic-content.js` | Original guides, worked examples and private check answer keys |
 | `scripts/` | Deployment setup, migration, account recovery and backup utilities |
 | `deploy/` | Nginx, PostgreSQL initialization and backup timer examples |
 | `tests/` | Server integration, security, configuration and UI workflow tests |

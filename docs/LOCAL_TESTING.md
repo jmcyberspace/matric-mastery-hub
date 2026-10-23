@@ -17,6 +17,8 @@ cd matric-mastery-hub
 
 For an existing checkout of this branch, use `git pull --ff-only` to get the update. Keep your existing `.env.local` file when updating.
 
+**Updating an earlier ZIP installation:** download and extract the new ZIP into a temporary folder, then copy its contents into your existing project folder, replacing the source files. Keep the original `.env.local` in that project folder and retain the Docker database volume. Run `npm run local` from the original folder to rebuild and apply the additive migrations, then refresh the browser with Ctrl+F5. Your existing administrator, authenticator and records remain; do not run administrator creation again. The new ZIP contains no `.env.local`.
+
 ## 2. Start the app
 
 ```powershell
@@ -44,8 +46,10 @@ Email delivery is not required for account creation. The example address is only
 1. As administrator, open **Classes**, create a test class and use **Invite someone** to create a learner invitation for `learner@example.test`. Select that class.
 2. Copy the private invitation link into an incognito/private browser window on the same PC. Create the learner account and accept the privacy notice. Keep the administrator in your original window.
 3. As administrator, publish a short assessment for the class. As learner, open it, answer a question, refresh to check autosave, finish and review the result. Check the class report in the administrator window.
-4. Try a foundation assessment, a study plan, a focus session, CSV export and Print / Save as PDF. Resize the browser to inspect the narrow layout.
-5. Stop and restart the app using the commands below, then confirm your accounts and assessment records remain.
+4. In the learner window, search the home page for a topic and open it. Expand its guide and worked example, answer the two-question check and review the explanations. Try the other question set, then return home to see the latest saved score. These checks work without AI credentials.
+5. When AI is configured, try each teaching mode. Ask a follow-up, reopen the saved conversation and choose **Review my reasoning with AI** after a check. Verify the tutor explains the selected topic and that hint mode leaves the learner a next step to try. Read [AI learning acceptance checks](AI_LEARNING.md).
+6. Open **Study record** from the learner home or menu to try the focus timer and plans. Try a foundation assessment, CSV export and Print / Save as PDF. Resize the browser to inspect navigation, expanded topic checks and the message composer. Administrator and teacher homes show management controls rather than the learner study dashboard.
+7. Stop and restart the app using the commands below, then confirm your accounts, topic checks and assessment records remain.
 
 For teacher-role checks, create a teacher invitation as administrator, choose **No class**, and open it in a separate browser session. That teacher can create their own class and invite learners.
 
@@ -78,6 +82,8 @@ The AI tutor and password-reset email are optional. To test them, enter your own
 | `LOCAL_SMTP_USER`, `LOCAL_SMTP_PASSWORD` | Both required when your SMTP provider uses authentication |
 
 Use single quotes around values containing dollar signs, hashes or spaces. Keep credentials out of Git and screenshots. With these settings blank, accounts, classes, assessments, reports and study tools still work. Live AI and mail require internet access.
+
+For live tutoring, use an Anthropic API key and a model identifier available to that provider account. Add both values to the existing `.env.local`, then run `npm run local` to recreate the app with those settings. A connected status means configuration is present; send a test question to verify provider access. There is no built-in demonstration reply or bundled API credit.
 
 This profile uses local HTTP and development cookie/header settings: cookies are not marked Secure, and production CSP/HSTS headers are disabled. Session checks, CSRF/origin protection, roles and staff MFA remain active. It is a local testing configuration. Use the separate [HTTPS deployment guide](DEPLOYMENT.md) for public hosting.
 

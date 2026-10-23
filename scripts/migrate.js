@@ -18,7 +18,7 @@ try {
     const runtimeRole = (await tx.query("SELECT 1 FROM pg_roles WHERE rolname='matric_app'")).rows.length;
     if (runtimeRole) {
       await tx.query('GRANT USAGE ON SCHEMA public TO matric_app');
-      await tx.query('GRANT SELECT,INSERT,UPDATE,DELETE ON users,sessions,rate_limits,classes,memberships,invitations,reset_tokens,assessments,questions,attempts,study_sessions,plans,threads,messages,ai_requests,audit_events TO matric_app');
+      await tx.query('GRANT SELECT,INSERT,UPDATE,DELETE ON users,sessions,rate_limits,classes,memberships,invitations,reset_tokens,assessments,questions,attempts,study_sessions,plans,threads,messages,ai_requests,audit_events,topic_checks TO matric_app');
       await tx.query('GRANT USAGE,SELECT ON ALL SEQUENCES IN SCHEMA public TO matric_app');
       await tx.query('REVOKE ALL ON schema_migrations FROM matric_app');
     }

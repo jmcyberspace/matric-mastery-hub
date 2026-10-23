@@ -167,11 +167,72 @@ test('AI uses a server prompt, rejects injected system fields, isolates chats an
   const messages = (await call('learner', 'get', '/threads/' + threadId)).body.messages;
   assert.deepEqual(messages.map(m => m.role), ['user','assistant']);
 });
+test('topic tutoring binds the reference and teaching mode without exposing question keys or profile details', async () => {
+  assert.equal((await call('teacher', 'post', '/threads', { subject: 'maths', topicId: 'net-force' })).status, 400);
+  assert.equal((await call('teacher', 'post', '/threads', { subject: 'maths', topicId: 'invented' })).status, 400);
+  const created = await call('teacher', 'post', '/threads', { subject: 'physics', topicId: 'net-force' });
+  assert.equal(created.status, 201);
+  const body = { threadId: created.body.thread.id, requestId: id(), message: 'I added the opposite forces. What next?', mode: 'hint' };
+  const before = aiCalls;
+  assert.equal((await call('teacher', 'post', '/tutor', body)).status, 200);
+  assert.equal(aiCalls, before + 1);
+  assert.match(lastAiBody.system, /HINT mode/); assert.match(lastAiBody.system, /Do not reveal the complete solution/);
+  assert.match(lastAiBody.system, /Selected topic: Net force & acceleration/); assert.match(lastAiBody.system, /18 N east/);
+  assert.ok(!lastAiBody.system.includes('force-a')); assert.ok(!lastAiBody.system.includes(people.teacher.email));
+  assert.equal((await call('teacher', 'post', '/tutor', { ...body, mode: 'example' })).status, 409);
+  assert.equal(aiCalls, before + 1);
+  const history = await call('teacher', 'get', '/threads');
+  assert.equal(history.body.threads[0].topic_title, 'Net force & acceleration');
+  assert.equal((await call('learner', 'get', '/threads/' + body.threadId)).status, 404);
+});
+test('topic checks hide answer keys, mark on the server and safely deduplicate retries', async () => {
+  assert.equal((await request(app).get('/api/topics')).status, 401);
+  const catalog = await call('learner', 'get', '/topics');
+  assert.equal(catalog.status, 200); assert.equal(catalog.body.topics.length, 8);
+  assert.ok(catalog.body.topics.every(t => !t.questions && !t.guide && t.lastCheck === null));
+  const detail = await call('learner', 'get', '/topics/quadratic-equations');
+  assert.equal(detail.status, 200); assert.equal(detail.body.questions.length, 2);
+  assert.equal(detail.body.topic.questions, undefined);
+  assert.ok(detail.body.questions.every(q => q.answer === undefined && q.explanation === undefined));
+  assert.equal((await call('learner', 'get', '/topics/missing')).status, 404);
+  const body = { requestId: id(), version: 1, answers: [{ questionId: 'roots-a', answer: 2 }, { questionId: 'zero-product-a', answer: 0 }] };
+  assert.equal((await call('learner', 'post', '/topics/quadratic-equations/check', { ...body, score: 2 })).status, 400);
+  assert.equal((await call('learner', 'post', '/topics/quadratic-equations/check', { ...body, version: 0 })).status, 409);
+  assert.equal((await call('learner', 'post', '/topics/quadratic-equations/check', { ...body, answers: [body.answers[0], body.answers[0]] })).status, 400);
+  assert.equal((await call('learner', 'post', '/topics/quadratic-equations/check', { ...body, answers: [body.answers[0], { questionId: 'force-a', answer: 0 }] })).status, 400);
+  const first = await call('learner', 'post', '/topics/quadratic-equations/check', body);
+  assert.equal(first.status, 200, JSON.stringify(first.body)); assert.equal(first.body.check.score, 1); assert.equal(first.body.check.total, 2);
+  assert.equal(first.body.check.feedback[1].correct, false); assert.match(first.body.check.feedback[1].explanation, /at least one factor/);
+  const again = await call('learner', 'post', '/topics/quadratic-equations/check', { ...body, answers: [...body.answers].reverse() });
+  assert.deepEqual(again.body, first.body);
+  assert.equal((await call('learner', 'post', '/topics/quadratic-equations/check', { ...body, answers: [{ questionId: 'roots-a', answer: 0 }, body.answers[1]] })).status, 409);
+  const next = await call('learner', 'get', '/topics/quadratic-equations');
+  assert.equal(next.body.lastCheck.score, 1); assert.deepEqual(next.body.questions.map(q => q.id), ['roots-b', 'zero-product-b']);
+  const progress = await call('learner', 'get', '/topics');
+  assert.equal(progress.body.topics.find(t => t.id === 'quadratic-equations').lastCheck.score, 1);
+  const other = await call('otherLearner', 'get', '/topics/quadratic-equations');
+  assert.equal(other.body.lastCheck, null); assert.equal(other.body.questions[0].id, 'roots-a');
+  const second = await call('learner', 'post', '/topics/quadratic-equations/check', { requestId: id(), version: 1, answers: [{ questionId: 'roots-b', answer: 0 }, { questionId: 'zero-product-b', answer: 3 }] });
+  assert.equal(second.body.check.score, 2);
+  assert.equal((await db.query('SELECT count(*)::int AS n FROM topic_checks WHERE user_id=$1', [people.learner.id])).rows[0].n, 2);
+});
+test('workspace summaries are role-specific and teachers only see their own classes and learners', async () => {
+  assert.equal((await call('learner', 'get', '/workspace')).status, 403);
+  const teacher = await call('teacher', 'get', '/workspace');
+  assert.equal(teacher.status, 200, JSON.stringify(teacher.body));
+  assert.equal(teacher.body.stats.classes, 1); assert.equal(teacher.body.stats.learners, 1); assert.equal(teacher.body.stats.assessments, 1);
+  assert.equal(teacher.body.classes[0].id, classId); assert.equal(teacher.body.platform, null);
+  const other = await call('otherTeacher', 'get', '/workspace');
+  assert.equal(other.body.stats.learners, 0); assert.deepEqual(other.body.classes, []);
+  const admin = await call('admin', 'get', '/workspace');
+  assert.equal(admin.body.platform.active_accounts, 5); assert.equal(admin.body.platform.ai_replies, 2);
+  assert.ok(!JSON.stringify(admin.body).includes('How do quadratic equations work'));
+});
 test('AI failures are explicit and sanitized; database quotas fail closed', async () => {
   aiFails = true;
   const failedBody = { threadId, requestId: id(), message: 'Help with algebra.' };
   const failed = await call('learner', 'post', '/tutor', failedBody);
-  assert.equal(failed.status, 503); assert.ok(!JSON.stringify(failed.body).includes('secret'));
+  assert.equal(failed.status, 503); assert.equal(failed.body.code, 'AI_REQUEST_FAILED'); assert.ok(!JSON.stringify(failed.body).includes('secret'));
   const retry = await call('learner', 'post', '/tutor', failedBody);
   assert.equal(retry.status, 409); assert.equal(retry.body.code, 'AI_REQUEST_FAILED');
   aiFails = false;
@@ -247,8 +308,9 @@ test('disabling a user revokes access; learner deletion removes personal records
   assert.equal((await call('otherTeacher', 'get', '/classes')).status, 401);
   const exported = await call('learner', 'get', '/account/export');
   assert.equal(exported.status, 200); assert.equal(exported.body.profile.password_hash, undefined);
+  assert.equal(exported.body.topicChecks.length, 2); assert.ok(exported.body.conversations.some(t => t.id === threadId));
   assert.equal((await call('learner', 'delete', '/account', { password })).status, 200);
-  for (const table of ['attempts','sessions','study_sessions','threads']) {
+  for (const table of ['attempts','sessions','study_sessions','threads','topic_checks']) {
     assert.equal((await db.query('SELECT count(*)::int AS n FROM ' + table + ' WHERE user_id=$1', [people.learner.id])).rows[0].n, 0);
   }
 });

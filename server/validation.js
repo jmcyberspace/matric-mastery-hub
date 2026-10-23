@@ -20,5 +20,6 @@ export const assessment = z.object({
 }).strict();
 export const chat = z.object({
   threadId: uuid, requestId: uuid, message: z.string().trim().min(1).max(4000),
+  mode: z.enum(['explain','example','hint','check']).default('explain'),
 }).strict();
 export const parse = (schema, value) => schema.parse(value);

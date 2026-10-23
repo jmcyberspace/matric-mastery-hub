@@ -7,6 +7,7 @@ import { registerAuth } from './auth.js';
 import { registerLearning } from './learning.js';
 import { registerTeaching } from './teaching.js';
 import { registerTutor } from './tutor.js';
+import { registerStudy } from './study.js';
 export async function createApp({ db, config, aiFetch, serveStatic = true }) {
   const app = express();
   app.disable('x-powered-by');
@@ -64,6 +65,7 @@ export async function createApp({ db, config, aiFetch, serveStatic = true }) {
   registerLearning(app, db);
   registerTeaching(app, db, config);
   registerTutor(app, db, config, aiFetch);
+  registerStudy(app, db);
   app.use('/api', (_req, res) => res.status(404).json({ error: 'Endpoint not found.' }));
   if (serveStatic) {
     const dist = resolve(process.cwd(), 'dist');
@@ -83,7 +85,7 @@ export async function createApp({ db, config, aiFetch, serveStatic = true }) {
       message = status === 503 ? 'This service is temporarily unavailable. Please try again later.' : 'We could not complete this request. Please try again.';
     }
     if (status === 429) res.setHeader('Retry-After', '60');
-    res.status(status).json({ error: message, requestId: req.requestId });
+    res.status(status).json({ error: message, requestId: req.requestId, ...(error.code === 'AI_REQUEST_FAILED' ? { code: 'AI_REQUEST_FAILED' } : {}) });
   });
   return app;
 }

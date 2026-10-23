@@ -29,9 +29,9 @@ export function Dashboard({ user, navigate, notify }) {
     const key = new Intl.DateTimeFormat('en-CA', { timeZone: 'Africa/Johannesburg' }).format(day);
     return Math.round((data?.focus.find(item => String(item.day).slice(0, 10) === key)?.seconds || 0) / 60);
   });
-  return <><PageHeading eyebrow="YOUR STUDY SPACE" title={'Hello, ' + user.name.split(' ')[0] + '.'} description="A fresh page. A little more progress." action={<span className="date-chip"><CalendarDays size={16} />{date(Date.now())}</span>} />
+  return <><PageHeading eyebrow="YOUR STUDY RECORD" title="See the work you have put in." description="Review your practice, follow your teacher’s plans and record a focused session." action={<span className="date-chip"><CalendarDays size={16} />{date(Date.now())}</span>} />
     <LoadState state={state}>{data && <>
-      <div className="dashboard-top"><section className="welcome-panel"><span className="pill pale">GRADE {user.grade} · YOUR NEXT CHAPTER</span><h2>One good session.<br />One step forward.</h2><p>Choose a subject, test what you know, and make room for what comes next.</p><Button onClick={() => navigate('/practice')}>Find your next practice<ArrowRight size={17} /></Button><div className="welcome-art" aria-hidden="true"><span>01</span><div /><span>02</span><div /><span>03</span></div></section>
+      <div className="progress-focus">
         <section className="focus-card"><div className="section-heading"><h3>Make time for progress</h3><Clock3 size={18} /></div><p className="muted small">Start a focused study session. Save it when you finish.</p>
           <div className="focus-time">{data.activeFocus ? duration(Math.floor((now + offset.current - new Date(data.activeFocus.started_at).getTime()) / 1000)) : '00:00'}</div>
           <select aria-label="Study subject" value={data.activeFocus?.subject || focusSubject} disabled={Boolean(data.activeFocus)} onChange={e => setFocusSubject(e.target.value)}>{SUBJECTS.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}</select>
@@ -43,11 +43,6 @@ export function Dashboard({ user, navigate, notify }) {
         <div><span>Focus in the last 7 days</span><strong>{studyMinutes}<small>minutes saved</small></strong></div>
         <div><span>Teacher study plans</span><strong>{pendingPlans.length}<small>to work through</small></strong></div>
       </div>
-      <div className="section-heading"><div><p className="eyebrow">MAKE IT YOUR OWN</p><h2>What will you work on?</h2></div><button className="text-link" onClick={() => navigate('/practice')}>All practice<ArrowRight size={16} /></button></div>
-      <div className="subject-grid">{SUBJECTS.map(s => { const record = data.subjects.find(row => row.subject === s.id); const progress = { count: record?.completed || 0, average: record?.average ?? null }; return <button key={s.id} className={'subject-card ' + s.tone} onClick={() => navigate('/practice?subject=' + s.id)}>
-        <div className="subject-card-top"><span className="subject-symbol">{s.mark}</span><ArrowUpRight size={20} /></div><h3>{s.name}</h3><p>{s.description}</p>
-        <div className="subject-card-bottom"><span>{progress.count ? progress.count + ' completed' : 'Ready when you are'}</span><strong>{progress.average === null ? 'Start' : progress.average + '%'}</strong></div>
-      </button>; })}</div>
       <div className="two-columns lower-grid"><section className="panel"><div className="section-heading"><h2>Your study rhythm</h2><span className="small muted">Last 7 days · minutes</span></div>
         <div className="activity-chart" aria-label={'Saved study minutes by day: ' + dailyValues.join(', ')}>{weekdays.map((day, i) => <div className="activity-column" key={i}><span>{dailyValues[i]}</span><svg viewBox="0 0 32 110" role="presentation"><rect x="3" y="0" width="26" height="110" rx="6" className="bar-track" /><rect x="3" y={110 - Math.max(3, dailyValues[i] / Math.max(1, ...dailyValues) * 105)} width="26" height={Math.max(3, dailyValues[i] / Math.max(1, ...dailyValues) * 105)} rx="6" className="bar-fill" /></svg><small>{new Intl.DateTimeFormat('en-ZA', { weekday: 'short', timeZone: 'Africa/Johannesburg' }).format(day)}</small></div>)}</div>
         {!studyMinutes && <p className="muted small">Your first saved focus session will appear here.</p>}

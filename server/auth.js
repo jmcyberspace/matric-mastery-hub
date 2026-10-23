@@ -186,6 +186,8 @@ export async function registerAuth(app, db, config) {
     for (const [key, sql] of Object.entries({
       attempts: 'SELECT * FROM attempts WHERE user_id=$1',
       studySessions: 'SELECT * FROM study_sessions WHERE user_id=$1',
+      topicChecks: 'SELECT * FROM topic_checks WHERE user_id=$1',
+      conversations: 'SELECT id,subject,topic_id,created_at,updated_at FROM threads WHERE user_id=$1',
       plans: 'SELECT * FROM plans WHERE learner_id=$1',
       messages: 'SELECT m.* FROM messages m JOIN threads t ON t.id=m.thread_id WHERE t.user_id=$1',
     })) results[key] = (await db.query(sql, [req.user.id])).rows;
